@@ -31,7 +31,8 @@ func removeContainerPath(d *Daemon, name string) error {
 	if vgnameIsSet {
 		output, err := exec.Command("umount", cpath).CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("failed to unmount container path '%s'.\nError: %v\nOutput: %s", cpath, err, output)
+			shared.Logf("failed to unmount container path '%s'.\nError: %v\nOutput: %s", cpath, err, output)
+			//return fmt.Errorf("failed to unmount container path '%s'.\nError: %v\nOutput: %s", cpath, err, output)
 		}
 
 		err = shared.LVMRemoveLV(vgname, name)
