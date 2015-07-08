@@ -308,6 +308,11 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Error mounting snapshot LV: %v\noutput:'%s'", err, output)
 			}
 
+			err = os.MkdirAll(rootfsPath, 0700)
+			if err != nil {
+				return InternalError(fmt.Errorf("Error creating rootfs directory"))
+			}
+
 			if !c.isPrivileged() {
 				err = shiftRootfs(c, name, d)
 				if err != nil {
