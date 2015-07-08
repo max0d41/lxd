@@ -313,6 +313,10 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Error creating rootfs directory: %v", err)
 			}
 
+			if err := extractImage(hash, name, d); err != nil {
+				return err
+			}
+
 			if !c.isPrivileged() {
 				err = shiftRootfs(c, name, d)
 				if err != nil {
