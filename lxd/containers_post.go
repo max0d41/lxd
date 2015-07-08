@@ -216,7 +216,8 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 	hash = imgInfo.Fingerprint
 
 	dpath := shared.VarPath("lxc", req.Name)
-	if shared.PathExists(dpath) {
+	rootfsPath := fmt.Sprintf("%s/rootfs", dpath)
+	if shared.PathExists(rootfsPath) {
 		return InternalError(fmt.Errorf("Container exists"))
 	}
 
@@ -299,7 +300,6 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 		})
 
 	} else {
-		rootfsPath := fmt.Sprintf("%s/rootfs", dpath)
 		err = os.MkdirAll(rootfsPath, 0700)
 		if err != nil {
 			return InternalError(fmt.Errorf("Error creating rootfs directory"))
