@@ -310,7 +310,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 
 			err = os.MkdirAll(rootfsPath, 0700)
 			if err != nil {
-				return InternalError(fmt.Errorf("Error creating rootfs directory"))
+				return fmt.Errorf("Error creating rootfs directory: %v", err)
 			}
 
 			if !c.isPrivileged() {
