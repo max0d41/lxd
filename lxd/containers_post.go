@@ -285,7 +285,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Need a LVM thin pool")
 			}
 
-			lvpath, err := shared.LVMCreateThinLV(name, poolname, vgname)
+			lvpath, err := shared.LVMCreateThinLV(name, poolname, vgname, req.Fssize)
 			if err != nil {
 				shared.Logf("Error from LVMCreateThinLV: '%v'", err)
 				return fmt.Errorf("Error Creating LVM LV for new container: %v", err)

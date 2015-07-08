@@ -54,8 +54,11 @@ func LVMCreateDefaultThinPool(vgname string) (string, error) {
 	return defaultThinPoolName, nil
 }
 
-func LVMCreateThinLV(lvname string, poolname string, vgname string) (string, error) {
-	output, err := exec.Command("lvcreate", "--thin", "-n", lvname, "--virtualsize", defaultThinLVSize, fmt.Sprintf("%s/%s", vgname, poolname)).CombinedOutput()
+func LVMCreateThinLV(lvname string, poolname string, vgname string, lvsize string) (string, error) {
+	if lvsize == "" {
+		lvsize = defaultThinLVSize
+	}
+	output, err := exec.Command("lvcreate", "--thin", "-n", lvname, "--virtualsize", lvsize, fmt.Sprintf("%s/%s", vgname, poolname)).CombinedOutput()
 	if err != nil {
 		Debugf("could not create LV named '%s': '%s'", lvname, output)
 		return "", fmt.Errorf("Could not create thin LV named %s", lvname)

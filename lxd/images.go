@@ -375,7 +375,7 @@ func createImageLV(d *Daemon, builddir string, fingerprint string, vgname string
 		}
 	}
 
-	lvpath, err := shared.LVMCreateThinLV(fingerprint, poolname, vgname)
+	lvpath, err := shared.LVMCreateThinLV(fingerprint, poolname, vgname, "")
 	if err != nil {
 		shared.Logf("Error from LVMCreateThinLV: '%v'", err)
 		return fmt.Errorf("Error Creating LVM LV for new image: %v", err)

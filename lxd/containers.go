@@ -76,6 +76,7 @@ type containerPostReq struct {
 	Config    map[string]string    `json:"config"`
 	Profiles  []string             `json:"profiles"`
 	Ephemeral bool                 `json:"ephemeral"`
+	Fssize    string               `json:"fssize"`
 }
 
 type containerImageSource struct {
