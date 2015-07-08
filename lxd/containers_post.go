@@ -279,12 +279,12 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 		})
 
 	} else if vgnameIsSet {
-		poolname, poolnameIsSet, err := getServerConfigValue(d, "core.lvm_thinpool_name")
-		if !poolnameIsSet {
-			return fmt.Errorf("Need a LVM thin pool")
-		}
-
 		run = shared.OperationWrap(func() error {
+			poolname, poolnameIsSet, err := getServerConfigValue(d, "core.lvm_thinpool_name")
+			if !poolnameIsSet {
+				return fmt.Errorf("Need a LVM thin pool")
+			}
+
 			lvpath, err := shared.LVMCreateThinLV(name, poolname, vgname)
 			if err != nil {
 				shared.Logf("Error from LVMCreateThinLV: '%v'", err)
@@ -303,7 +303,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Error creating container directory: %v", err)
 			}
 
-			output, err := exec.Command("mount", "-o", "discard", lvpath, destPath).CombinedOutput()
+			output, err = exec.Command("mount", "-o", "discard", lvpath, destPath).CombinedOutput()
 			if err != nil {
 				return fmt.Errorf("Error mounting snapshot LV: %v\noutput:'%s'", err, output)
 			}
