@@ -291,7 +291,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Error Creating LVM LV for new container: %v", err)
 			}
 
-			output, err := exec.Command("mkfs.ext4", "-E", "nodiscard,lazy_itable_init=0,lazy_journal_init=0", lvpath).CombinedOutput()
+			output, err := exec.Command("mkfs.ext4", lvpath).CombinedOutput()
 			if err != nil {
 				shared.Logf("Error output from mkfs.ext4: '%s'", output)
 				return fmt.Errorf("Error making filesystem on image LV: %v", err)
@@ -303,7 +303,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 				return fmt.Errorf("Error creating container directory: %v", err)
 			}
 
-			output, err = exec.Command("mount", "-o", "discard", lvpath, destPath).CombinedOutput()
+			output, err = exec.Command("mount", lvpath, destPath).CombinedOutput()
 			if err != nil {
 				return fmt.Errorf("Error mounting snapshot LV: %v\noutput:'%s'", err, output)
 			}
