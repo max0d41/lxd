@@ -251,7 +251,7 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 		return InternalError(fmt.Errorf("Error checking server config: %v", err))
 	}
 
-	if vgnameIsSet && shared.PathExists(fmt.Sprintf("%s.lv", shared.VarPath("images", hash))) {
+	if false && vgnameIsSet && shared.PathExists(fmt.Sprintf("%s.lv", shared.VarPath("images", hash))) {
 		run = shared.OperationWrap(func() error {
 			srcLVPath := fmt.Sprintf("/dev/%s/%s", vgname, hash)
 
@@ -277,6 +277,52 @@ func createFromImage(d *Daemon, req *containerPostReq) Response {
 
 			return nil
 		})
+
+	} else if vgnameIsSet {
+		poolname, poolnameIsSet, err := getServerConfigValue(d, "core.lvm_thinpool_name")
+		if !poolnameIsSet {
+			return fmt.Errorf("Need a LVM thin pool")
+		}
+
+		run = shared.OperationWrap(func() error {
+			lvpath, err := shared.LVMCreateThinLV(name, poolname, vgname)
+			if err != nil {
+				shared.Logf("Error from LVMCreateThinLV: '%v'", err)
+				return fmt.Errorf("Error Creating LVM LV for new container: %v", err)
+			}
+
+			output, err := exec.Command("mkfs.ext4", "-E", "nodiscard,lazy_itable_init=0,lazy_journal_init=0", lvpath).CombinedOutput()
+			if err != nil {
+				shared.Logf("Error output from mkfs.ext4: '%s'", output)
+				return fmt.Errorf("Error making filesystem on image LV: %v", err)
+			}
+
+			destPath := shared.VarPath("lxc", name)
+			err = os.MkdirAll(destPath, 0700)
+			if err != nil {
+				return fmt.Errorf("Error creating container directory: %v", err)
+			}
+
+			output, err := exec.Command("mount", "-o", "discard", lvpath, destPath).CombinedOutput()
+			if err != nil {
+				return fmt.Errorf("Error mounting snapshot LV: %v\noutput:'%s'", err, output)
+			}
+
+			if !c.isPrivileged() {
+				err = shiftRootfs(c, name, d)
+				if err != nil {
+					return err
+				}
+			}
+
+			err = templateApply(c, "create")
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
 
 	} else if backing_fs == "btrfs" && shared.PathExists(fmt.Sprintf("%s.btrfs", shared.VarPath("images", hash))) {
 		run = shared.OperationWrap(func() error {

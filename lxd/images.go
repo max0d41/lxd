@@ -336,14 +336,14 @@ func removeImgWorkdir(d *Daemon, builddir string) {
 
 // We've got an image with the directory, create .btrfs or .lv
 func buildOtherFs(d *Daemon, builddir string, fp string) error {
-	vgname, vgnameIsSet, err := getServerConfigValue(d, "core.lvm_vg_name")
+	/*vgname, vgnameIsSet, err := getServerConfigValue(d, "core.lvm_vg_name")
 	if err != nil {
 		return fmt.Errorf("Error checking server config: %v", err)
 	}
 
 	if vgnameIsSet {
 		return createImageLV(d, builddir, fp, vgname)
-	}
+	}*/
 
 	switch d.BackingFs {
 	case "btrfs":
